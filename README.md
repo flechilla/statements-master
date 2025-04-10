@@ -6,6 +6,8 @@ A Next.js application for visualizing and managing credit card statements and ex
 
 - Track and visualize expenses across multiple credit cards and banks
 - Search and filter transactions
+- AI-powered statement parsing and data extraction
+- Upload and process credit card statements automatically
 - RESTful API for accessing statement data
 - PostgreSQL database with Drizzle ORM
 
@@ -24,10 +26,11 @@ A Next.js application for visualizing and managing credit card statements and ex
 cp .env.example .env
 ```
 
-Edit the `.env` file with your PostgreSQL connection string:
+Edit the `.env` file with your PostgreSQL connection string and Anthropic API key:
 
 ```
 DATABASE_URL="postgres://username:password@hostname:port/database"
+ANTHROPIC_API_KEY="your-anthropic-api-key"
 ```
 
 ### Database Setup

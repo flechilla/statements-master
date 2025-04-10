@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { statements, transactions } from "@/lib/db/schema";
 import { CardStatements } from "@/lib/types";
 import { getMonthName } from "@/lib/utils";
+import Link from "next/link";
 import { eq } from "drizzle-orm";
 
 // Server-side function to get all statements with transactions
@@ -105,6 +106,14 @@ export default async function Home() {
             Visualize and track your business expenses from credit card
             statements
           </p>
+          <div className="mt-4">
+            <Link 
+              href="/upload" 
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+            >
+              Upload New Statement
+            </Link>
+          </div>
         </header>
 
         <main>
