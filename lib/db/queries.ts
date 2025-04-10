@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { statements, transactions } from "./tables/statements.table";
+import { statements, transactions } from "./schema/statements.table";
 import { eq, and, like, desc, sql } from "drizzle-orm";
 
 // Get all statements

@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { db } from "./index";
-import { statements, transactions } from "./tables/statements.table";
+import { statements, transactions } from "./schema";
 
 interface JsonStatement {
   statement_period: string;

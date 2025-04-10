@@ -1,5 +1,5 @@
 import { InferSelectModel, InferInsertModel } from "drizzle-orm";
-import { statements, transactions } from "./tables/statements.table";
+import { statements, transactions } from "./schema";
 
 export type Statement = InferSelectModel<typeof statements>;
 export type NewStatement = InferInsertModel<typeof statements>;
