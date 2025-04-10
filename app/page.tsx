@@ -1,65 +1,100 @@
-import { StatementViewer } from "@/components/statement"
-import { CardStatements, StatementData } from "@/lib/utils"
-import fs from 'fs'
-import path from 'path'
+import { StatementViewer } from "@/components/statement";
+import { db } from "@/lib/db";
+import { statements, transactions } from "@/lib/db/schema";
+import { CardStatements } from "@/lib/types";
+import { getMonthName } from "@/lib/utils";
+import { eq } from "drizzle-orm";
 
-// Server-side function to get all statements
-async function getAllStatements(): Promise<CardStatements[]> {
-  const monthMap: Record<string, string> = {
-    '01_january': 'January',
-    '02_feb': 'February',
-    '03_march': 'March',
-    '04_april': 'April',
-    '05_may': 'May',
-    '06_june': 'June',
-    '07_july': 'July',
-    '08_august': 'August',
-    '09_september': 'September',
-    '10_octuber': 'October',
-    '11_november': 'November',
-    '12_december': 'December'
+// Server-side function to get all statements with transactions
+async function getAllStatementsWithTransactions(): Promise<CardStatements[]> {
+  // Get all statements
+  const statementsData = await db
+    .select()
+    .from(statements)
+    .orderBy(statements.createdAt);
+
+  // Group statements by card name and bank
+  const cardMap = new Map<
+    string,
+    {
+      bankName: string;
+      statements: Array<{
+        id: number;
+        month: string;
+        statementPeriod: string;
+        totalAmount: number;
+        transactions: Array<{
+          id: number;
+          date: string;
+          description: string;
+          amount: number;
+          justification: string | null;
+          category?: string;
+        }>;
+      }>;
+    }
+  >();
+
+  for (const statement of statementsData) {
+    const key = statement.cardName;
+
+    if (!cardMap.has(key)) {
+      cardMap.set(key, {
+        bankName: statement.bankName,
+        statements: [],
+      });
+    }
+
+    // Get transactions for this statement
+    const transactionsData = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.statementId, statement.id));
+
+    // Calculate total amount
+    const totalAmount = transactionsData.reduce(
+      (sum, t) => sum + Number(t.amount),
+      0
+    );
+
+    // Get month from statement period or first transaction
+    let month = "Unknown";
+    if (transactionsData.length > 0) {
+      month = getMonthName(transactionsData[0].date);
+    }
+
+    // Add statement with transactions to the map
+    cardMap.get(key)?.statements.push({
+      id: statement.id,
+      month: month,
+      statementPeriod: statement.statementPeriod,
+      totalAmount: totalAmount,
+      transactions: transactionsData.map((t) => ({
+        id: t.id,
+        date: t.date,
+        description: t.description,
+        amount: Number(t.amount),
+        justification: t.justification,
+        category: t.category || undefined,
+      })),
+    });
   }
 
-  // Get card folders
-  const dataDir = path.join(process.cwd(), 'data')
-  const cardFolders = fs.readdirSync(dataDir).filter(folder => 
-    fs.statSync(path.join(dataDir, folder)).isDirectory()
-  )
-  
-  return cardFolders.map(folder => {
-    const folderPath = path.join(process.cwd(), 'data', folder)
-    const files = fs.readdirSync(folderPath).filter(file => file.endsWith('.json'))
-    
-    const statements = files.map(file => {
-      const monthKey = file.replace('.json', '')
-      const monthName = monthMap[monthKey] || monthKey
-      
-      // Get statement data
-      const filePath = path.join(process.cwd(), 'data', folder, file)
-      const fileContents = fs.readFileSync(filePath, 'utf8')
-      const data: StatementData = JSON.parse(fileContents)
-      
-      return {
-        month: monthName,
-        monthKey,
-        data
-      }
-    }).sort((a, b) => {
-      // Sort by month number extracted from the filename (01, 02, etc.)
-      const aNum = parseInt(a.monthKey.substring(0, 2))
-      const bNum = parseInt(b.monthKey.substring(0, 2))
-      return aNum - bNum
-    })
-    
-    return {
-      cardName: folder,
-      statements
-    }
-  })
+  // Convert map to array
+  const result: CardStatements[] = [];
+  cardMap.forEach((value, key) => {
+    result.push({
+      cardName: key,
+      bankName: value.bankName,
+      statements: value.statements,
+    });
+  });
+
+  return result;
 }
 
 export default async function Home() {
-  const cardStatements = await getAllStatements()
+  const cardStatements = await getAllStatementsWithTransactions();
 
   return (
     <div className="min-h-screen p-4 md:p-8">
@@ -67,7 +102,8 @@ export default async function Home() {
         <header className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Statement Master</h1>
           <p className="text-muted-foreground">
-            Visualize and track your business expenses from credit card statements
+            Visualize and track your business expenses from credit card
+            statements
           </p>
         </header>
 
@@ -76,9 +112,12 @@ export default async function Home() {
         </main>
 
         <footer className="mt-12 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Statement Master | Business Expense Tracker</p>
+          <p>
+            © {new Date().getFullYear()} Statement Master | Business Expense
+            Tracker
+          </p>
         </footer>
       </div>
     </div>
-  )
+  );
 }

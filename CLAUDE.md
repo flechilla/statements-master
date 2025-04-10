@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Code Style Guidelines
 
 - **TypeScript**: Use strict typing, prefer explicit types over `any`
-- **Types**: Define types in `/lib/types` directory, one type per file, avoid using interfaces
+- **Types**: Define types in `/lib/types/` directory, one type per file, avoid using interfaces
 - **React**: Use functional components with TypeScript props interfaces
 - **Imports**: Group imports (React/Next.js, 3rd-party, local) with a blank line between groups
 - **Naming**: Use PascalCase for components, camelCase for variables/functions

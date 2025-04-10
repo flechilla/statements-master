@@ -5,17 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Button } from "@/components/ui/button"
-import { BusinessExpense, CardStatements, formatCurrency } from "@/lib/utils"
+import { formatCurrency, formatCardName } from "@/lib/utils"
+import { CardStatements, SelectableExpense } from "@/lib/types"
 
 interface StatementViewerProps {
   cardStatements: CardStatements[]
-}
-
-interface SelectableExpense extends BusinessExpense {
-  id: string;
-  isSelected: boolean;
-  cardName: string;
-  month: string;
 }
 
 export function StatementViewer({ cardStatements }: StatementViewerProps) {
@@ -103,6 +97,7 @@ export function StatementViewer({ cardStatements }: StatementViewerProps) {
           .filter(statement => selectedMonths.includes(statement.month))
           .map(statement => ({
             cardName: card.cardName,
+            bankName: card.bankName,
             ...statement
           }))
       );
@@ -120,18 +115,19 @@ export function StatementViewer({ cardStatements }: StatementViewerProps) {
     
     // Create selectable expenses from filtered statements
     const newSelectableExpenses = filteredStatements.flatMap((statement) => 
-      statement.data.business_expenses.map((expense: BusinessExpense, expenseIndex: number) => {
-        const id = `${statement.cardName}-${statement.month}-${expenseIndex}`;
+      statement.transactions.map((expense) => {
+        const id = expense.id;
         const isSelected = existingExpensesMap.has(id) 
-          ? existingExpensesMap.get(id) 
+          ? existingExpensesMap.get(id)! 
           : true; // Default to selected for new expenses
         
         return {
           ...expense,
-          id,
           isSelected,
           cardName: statement.cardName,
-          month: statement.month
+          bankName: statement.bankName,
+          month: statement.month,
+          statementId: statement.id
         };
       })
     );
@@ -154,7 +150,7 @@ export function StatementViewer({ cardStatements }: StatementViewerProps) {
   }, [filteredStatements.length])
   
   // Toggle expense selection
-  const toggleExpenseSelection = (expenseId: string) => {
+  const toggleExpenseSelection = (expenseId: number) => {
     setSelectableExpenses(prev => 
       prev.map(expense => 
         expense.id === expenseId 
@@ -185,13 +181,6 @@ export function StatementViewer({ cardStatements }: StatementViewerProps) {
       averageExpense: average
     };
   }, [selectableExpenses])
-
-  // Format card name for display
-  const formatCardName = (name: string) => {
-    return name.split('-').map(word => 
-      word.charAt(0).toUpperCase() + word.slice(1)
-    ).join(' ')
-  }
 
   return (
     <Card className="w-full">
@@ -345,8 +334,8 @@ export function StatementViewer({ cardStatements }: StatementViewerProps) {
               
               <TabsContent value="details">
                 <div className="space-y-4">
-                  {filteredStatements.map((statement, index) => (
-                    <Card key={index}>
+                  {filteredStatements.map((statement) => (
+                    <Card key={statement.id}>
                       <CardHeader className="p-4 pb-2">
                         <CardTitle className="text-lg">{formatCardName(statement.cardName)} - {statement.month}</CardTitle>
                       </CardHeader>
@@ -354,16 +343,16 @@ export function StatementViewer({ cardStatements }: StatementViewerProps) {
                         <div className="space-y-2">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                             <div>
-                              <span className="font-medium">Statement Period:</span> {statement.data.statement_period}
+                              <span className="font-medium">Statement Period:</span> {statement.statementPeriod}
                             </div>
                             <div>
-                              <span className="font-medium">Bank:</span> {statement.data.bank_name}
+                              <span className="font-medium">Bank:</span> {statement.bankName}
                             </div>
                             <div>
-                              <span className="font-medium">Card:</span> {statement.data.card_name}
+                              <span className="font-medium">Card:</span> {formatCardName(statement.cardName)}
                             </div>
                             <div>
-                              <span className="font-medium">Total Business Expenses:</span> {formatCurrency(statement.data.total_business_expenses)}
+                              <span className="font-medium">Total Business Expenses:</span> {formatCurrency(statement.totalAmount)}
                             </div>
                           </div>
                         </div>
