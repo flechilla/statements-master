@@ -64,7 +64,7 @@ async function seed() {
               statementId: statement.id,
               date: expense.date,
               description: expense.description,
-              amount: expense.amount,
+              amount: String(expense.amount),
               justification: expense.justification || null,
               category: "business_expense",
             })

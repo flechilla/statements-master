@@ -4,7 +4,6 @@ import { db } from ".";
 async function main() {
   try {
     console.log("Migration started");
-    console.log(process.env.DATABASE_URL);
     await migrate(db, { migrationsFolder: "drizzle" });
     console.log("Migration completed");
     process.exit(0);
