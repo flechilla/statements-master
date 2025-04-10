@@ -1,22 +1,72 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Statement Master
+
+A Next.js application for visualizing and managing credit card statements and expenses.
+
+## Features
+
+- Track and visualize expenses across multiple credit cards and banks
+- Search and filter transactions
+- RESTful API for accessing statement data
+- PostgreSQL database with Drizzle ORM
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and npm/pnpm
+- PostgreSQL database
+
+### Environment Setup
+
+1. Copy the example environment file and fill in your database connection details:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+cp .env.example .env
+```
+
+Edit the `.env` file with your PostgreSQL connection string:
+
+```
+DATABASE_URL="postgres://username:password@hostname:port/database"
+```
+
+### Database Setup
+
+This application uses Drizzle ORM with PostgreSQL. To set up the database:
+
+1. Generate the SQL migration files:
+
+```bash
+pnpm db:generate
+```
+
+2. Apply the migrations to your database:
+
+```bash
+pnpm db:push
+```
+
+3. (Optional) Seed the database with sample data from JSON files:
+
+```bash
+pnpm db:seed
+```
+
+### Running the Development Server
+
+```bash
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Database Management
+
+- `pnpm db:generate` - Generate migration files from schema
+- `pnpm db:push` - Push schema changes to the database
+- `pnpm db:studio` - Open Drizzle Studio to view/edit data
+- `pnpm db:migrate` - Run migrations
+- `pnpm db:seed` - Seed database with sample data
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
