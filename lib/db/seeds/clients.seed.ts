@@ -34,7 +34,7 @@ async function seedClients() {
       },
     ];
 
-    let insertedClients: Client[] = [];
+    const insertedClients: Client[] = [];
 
     for (const client of clientsData) {
       // Check if client already exists
