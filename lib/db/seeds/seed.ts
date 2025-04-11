@@ -16,10 +16,7 @@ async function seed() {
 
     // Step 2: Seed statements and transactions from statement files
     console.log("\n📊 Seeding statements and their transactions...");
-    const { statementsCount, transactionsCount } = await seedStatements();
-    console.log(
-      `✅ Successfully inserted ${statementsCount} statements and ${transactionsCount} transactions`
-    );
+    await seedStatements();
 
     // Step 3: Seed additional transactions not part of statements
     console.log("\n💵 Seeding additional transactions...");
