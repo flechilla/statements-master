@@ -6,9 +6,11 @@ import {
   timestamp,
   varchar,
 } from "drizzle-orm/pg-core";
+import { clients } from "./clients.table";
 
 export const statements = pgTable("statements", {
   id: serial("id").primaryKey(),
+  clientId: serial("client_id").references(() => clients.id),
   statementPeriod: text("statement_period").notNull(),
   bankName: varchar("bank_name", { length: 255 }).notNull(),
   cardName: varchar("card_name", { length: 255 }).notNull(),
