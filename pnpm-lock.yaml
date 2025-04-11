@@ -11,9 +11,6 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^1.2.9
         version: 1.2.9(zod@3.24.2)
-      '@neondatabase/serverless':
-        specifier: ^1.0.0
-        version: 1.0.0
       '@radix-ui/react-select':
         specifier: ^2.1.7
         version: 2.1.7(@types/react-dom@19.1.2(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -3312,6 +3309,7 @@ snapshots:
     dependencies:
       '@types/node': 22.14.0
       '@types/pg': 8.11.11
+    optional: true
 
   '@next/env@15.3.0': {}
 
@@ -3706,12 +3704,14 @@ snapshots:
   '@types/node@22.14.0':
     dependencies:
       undici-types: 6.21.0
+    optional: true
 
   '@types/pg@8.11.11':
     dependencies:
       '@types/node': 20.17.30
       pg-protocol: 1.8.0
       pg-types: 4.0.2
+    optional: true
 
   '@types/react-dom@19.1.2(@types/react@19.1.0)':
     dependencies:
@@ -5019,7 +5019,8 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
-  obuf@1.1.2: {}
+  obuf@1.1.2:
+    optional: true
 
   optionator@0.9.4:
     dependencies:
@@ -5054,11 +5055,14 @@ snapshots:
 
   path-parse@1.0.7: {}
 
-  pg-int8@1.0.1: {}
+  pg-int8@1.0.1:
+    optional: true
 
-  pg-numeric@1.0.2: {}
+  pg-numeric@1.0.2:
+    optional: true
 
-  pg-protocol@1.8.0: {}
+  pg-protocol@1.8.0:
+    optional: true
 
   pg-types@4.0.2:
     dependencies:
@@ -5069,6 +5073,7 @@ snapshots:
       postgres-date: 2.1.0
       postgres-interval: 3.0.0
       postgres-range: 1.1.4
+    optional: true
 
   picocolors@1.1.1: {}
 
@@ -5090,17 +5095,22 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  postgres-array@3.0.4: {}
+  postgres-array@3.0.4:
+    optional: true
 
   postgres-bytea@3.0.0:
     dependencies:
       obuf: 1.1.2
+    optional: true
 
-  postgres-date@2.1.0: {}
+  postgres-date@2.1.0:
+    optional: true
 
-  postgres-interval@3.0.0: {}
+  postgres-interval@3.0.0:
+    optional: true
 
-  postgres-range@1.1.4: {}
+  postgres-range@1.1.4:
+    optional: true
 
   postgres@3.4.5: {}
 
@@ -5483,7 +5493,8 @@ snapshots:
 
   undici-types@6.19.8: {}
 
-  undici-types@6.21.0: {}
+  undici-types@6.21.0:
+    optional: true
 
   unrs-resolver@1.4.1:
     optionalDependencies:

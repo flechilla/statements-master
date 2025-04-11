@@ -1,8 +1,8 @@
 import fs from "fs";
 import path from "path";
-import { db } from "./index";
-import { statements, transactions } from "./schema";
-import { seedClients } from "./seeds/clients.seed";
+import { db } from "../index";
+import { clients, statements, transactions } from "../schema";
+import { count, eq } from "drizzle-orm";
 
 interface JsonStatement {
   statement_period: string;
@@ -17,16 +17,34 @@ interface JsonStatement {
   total_business_expenses: number;
 }
 
-async function seed() {
+export async function seedStatements() {
   try {
-    console.log("Seeding started");
+    console.log("Seeding statements started");
 
-    // Seed clients
-    await seedClients();
-    console.log("Client seeding completed");
+    // check if statements table is empty
+    const statementsCount = await db
+      .select({ count: count() })
+      .from(statements);
+    if (statementsCount[0].count > 0) {
+      console.log("Statements table is not empty, skipping");
+      return;
+    }
+
+    const mainClient = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.email, "adriano@example.com"))
+      .limit(1);
+
+    if (mainClient.length === 0) {
+      console.log("Main client not found, skipping");
+      return;
+    }
 
     // Define card folders to process
     const cardFolders = ["chase-freedom", "chase-unlimited", "amex-gold"];
+    let totalStatementsInserted = 0;
+    let totalTransactionsInserted = 0;
 
     for (const folder of cardFolders) {
       console.log(`Processing ${folder} statements`);
@@ -59,8 +77,11 @@ async function seed() {
             statementPeriod: data.statement_period,
             bankName: data.bank_name,
             cardName: data.card_name,
+            clientId: mainClient[0].id,
           })
           .returning({ id: statements.id });
+
+        totalStatementsInserted++;
 
         // Insert transactions
         if (data.business_expenses && data.business_expenses.length > 0) {
@@ -76,6 +97,7 @@ async function seed() {
           );
 
           await db.insert(transactions).values(transactionsToInsert);
+          totalTransactionsInserted += transactionsToInsert.length;
           console.log(
             `Inserted ${transactionsToInsert.length} transactions for statement ${statement.id}`
           );
@@ -83,12 +105,28 @@ async function seed() {
       }
     }
 
-    console.log("Seeding completed");
-    process.exit(0);
+    console.log(
+      `Seeding completed: ${totalStatementsInserted} statements and ${totalTransactionsInserted} transactions inserted`
+    );
+    return {
+      statementsCount: totalStatementsInserted,
+      transactionsCount: totalTransactionsInserted,
+    };
   } catch (error) {
-    console.error("Seeding failed:", error);
-    process.exit(1);
+    console.error("Statements seeding failed:", error);
+    throw error;
   }
 }
 
-seed();
+// Run the seed function if this file is executed directly
+if (require.main === module) {
+  seedStatements()
+    .then(() => {
+      console.log("Statements seeding script completed successfully");
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error("Statements seeding script failed:", error);
+      process.exit(1);
+    });
+}

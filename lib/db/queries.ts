@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { statements, transactions } from "./schema/statements.table";
+import { clients, statements, transactions } from "./schema/index";
 import { eq, and, like, desc, sql } from "drizzle-orm";
 
 // Get all statements
@@ -77,4 +77,38 @@ export async function getCardsByBank(bankName: string) {
     .groupBy(statements.cardName);
 
   return result.map((r) => r.cardName);
+}
+
+// Client-related queries
+// Get all clients
+export async function getAllClients() {
+  return db.select().from(clients).orderBy(desc(clients.createdAt));
+}
+
+// Get client by ID
+export async function getClientById(id: number) {
+  return db.select().from(clients).where(eq(clients.id, id)).limit(1);
+}
+
+// Get client by email
+export async function getClientByEmail(email: string) {
+  return db.select().from(clients).where(eq(clients.email, email)).limit(1);
+}
+
+// Get all statements for a client
+export async function getStatementsByClientId(clientId: number) {
+  return db
+    .select()
+    .from(statements)
+    .where(eq(statements.clientId, clientId))
+    .orderBy(desc(statements.createdAt));
+}
+
+// Search clients by name
+export async function searchClientsByName(searchTerm: string) {
+  return db
+    .select()
+    .from(clients)
+    .where(like(clients.name, `%${searchTerm}%`))
+    .orderBy(clients.name);
 }

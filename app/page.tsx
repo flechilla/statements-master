@@ -107,8 +107,8 @@ export default async function Home() {
             statements
           </p>
           <div className="mt-4">
-            <Link 
-              href="/upload" 
+            <Link
+              href="/upload"
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
             >
               Upload New Statement

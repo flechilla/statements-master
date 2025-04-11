@@ -1,6 +1,16 @@
 // Database types
+export type Client = {
+  id: number;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  createdAt: string;
+};
+
 export type Statement = {
   id: number;
+  clientId: number;
   statementPeriod: string;
   bankName: string;
   cardName: string;
@@ -31,6 +41,11 @@ export type BusinessExpense = {
 export type StatementWithTransactions = Statement & {
   transactions: Transaction[];
   totalAmount: number;
+  client?: Client;
+};
+
+export type ClientWithStatements = Client & {
+  statements: Statement[];
 };
 
 export type CardStatements = {
